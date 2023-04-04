@@ -54,16 +54,16 @@ export const register = async (
       password: hashedPassword,
     };
 
-    console.log(allUserData);
     const userSaved = await new User(allUserData).save();
     console.log('userSaved', userSaved);
     const token = await new Token({
       userId: userSaved._id,
       token: getToken(userSaved._id),
     }).save();
-    console.log(token);
 
-    const url = `${process.env.BASE_URL}/users/verify/${userSaved._id}/${token.token}`;
+    const BASE_URL = process.env.BASE_URL || 'http://localhost:8081/api/v1'
+
+    const url = `${BASE_URL}/users/verify/${userSaved._id}/${token.token}`;
     const html = `<h1>Email Verification</h1>
         <h2>Hello ${userSaved.name}</h2>
         <p>Click the link below to verify mail</p>
