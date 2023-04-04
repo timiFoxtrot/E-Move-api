@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node ./dist/app.js",
     "dev": "nodemon ./dist/app",
-    "build": "tsc -w"
+    "build": "tsc"
   },
   "dependencies": {
     "@types/joi": "^17.2.3",
