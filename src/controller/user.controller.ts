@@ -17,6 +17,7 @@ import Donor from '../model/donorModel';
 import _ from 'lodash';
 import Transaction from '../model/transactionModel';
 import { loginSchema, userSchema } from '../utils/joiValidator';
+import Trip from '../model/tripModel';
 
 export const register = async (
   req: Request,
@@ -45,8 +46,8 @@ export const register = async (
 
     const hashedPassword = await toHash(userData.password);
 
-    const {ADMIN1_EMAIL, ADMIN2_EMAIL} = process.env
-    const adminArray = [ADMIN1_EMAIL, ADMIN2_EMAIL]
+    const { ADMIN1_EMAIL, ADMIN2_EMAIL } = process.env;
+    const adminArray = [ADMIN1_EMAIL, ADMIN2_EMAIL];
 
     const allUserData = {
       ...userData,
@@ -61,7 +62,7 @@ export const register = async (
       token: getToken(userSaved._id),
     }).save();
 
-    const BASE_URL = process.env.BASE_URL || 'http://localhost:8081/api/v1'
+    const BASE_URL = process.env.BASE_URL || 'http://localhost:8081/api/v1';
 
     const url = `${BASE_URL}/users/verify/${userSaved._id}/${token.token}`;
     const html = `<h1>Email Verification</h1>
@@ -70,7 +71,7 @@ export const register = async (
         <a href=${url}>verify mail</a>
         </div>`;
     await sendEmail(userSaved.email, 'Verify email', html);
-    
+
     return res.status(201).send({
       status: 'success',
       message: 'An email has been sent to your account please verify',
@@ -130,7 +131,7 @@ export const verifyEmail = async (
     //   status: 'success',
     //   message: 'Email verified successfully',
     // });
-    res.redirect('http://localhost:3000/users/verify')
+    res.redirect('https://emove.netlify.app/users/verify');
   } catch (error) {
     return res.status(500).send({
       status: 'error',
@@ -145,20 +146,21 @@ export const login = async (
 ) => {
   try {
     const { error } = loginSchema.validate(req.body);
-    if(error) {
+    if (error) {
       return res.status(400).send({
         success: false,
-        message: error.details[0].message
-      })
+        message: error.details[0].message,
+      });
     }
 
     const user = await User.findOne({ email: req.body.email });
-    if (!user) return res.status(400).send({message: 'Invalid email'});
+    if (!user) return res.status(400).send({ message: 'Invalid email' });
 
     const isMatch = await compare(user.password, req.body.password);
-    if (!isMatch) return res.status(400).send({message: 'Invalid password'});
+    if (!isMatch) return res.status(400).send({ message: 'Invalid password' });
 
-    if (!user.verified) return res.status(400).send({message: 'User not verified'});
+    if (!user.verified)
+      return res.status(400).send({ message: 'User not verified' });
 
     const token = loginToken(user._id.toString());
 
@@ -235,6 +237,7 @@ export const changePassword = async (req: Request, res: Response) => {
     res.status(400).json({ error: 'Invalid token' });
   }
 };
+
 export const forgotPassword = async (
   req: Request,
   res: Response,
@@ -257,7 +260,8 @@ export const forgotPassword = async (
       }).save();
     }
 
-    const link = `${process.env.BASE_URL}/password-reset/${user._id}/${token.token}`;
+    const BASE_URL = process.env.BASE_URL || 'http://localhost:8081'
+    const link = `${BASE_URL}/api/v1/users/password-reset/${user._id}/${token.token}`;
     await sendEmail(user.email, 'Password reset', link);
     //send password reset link to email
 
@@ -287,7 +291,7 @@ export const resetPassword = async (
     });
     if (!token) return res.status(400).send('Invalid link or expired');
 
-    user.password = req.body.password;
+    user.password = await toHash(req.body.password);
     await user.save();
     await token.delete();
 
@@ -465,5 +469,28 @@ export const getTransaction = async (
       status: 'An error occured',
       message: 'Data not found',
     });
+  }
+};
+
+export const tripHistoryByPassenger = async (req: Request, res: Response) => {
+  try {
+    const userId = req.userId;
+    const user = await User.findById({ _id: userId });
+    if (user) {
+      const { name } = user;
+      const tripsByUser = await Trip.find({ passenger: name });
+      console.log(tripsByUser);
+      if (tripsByUser) {
+        res.status(200).json({ status: 'success', data: tripsByUser });
+      } else {
+        res
+          .status(404)
+          .json({ status: 'failed', message: 'No trips created by user' });
+      }
+    }
+  } catch (err: any) {
+    res
+      .status(400)
+      .json({ message: 'Internal server error', error: err.message });
   }
 };

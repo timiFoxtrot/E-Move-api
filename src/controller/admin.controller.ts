@@ -325,25 +325,4 @@ export const tripHistory = async (req: Request, res: Response) => {
   }
 };
 
-export const tripHistoryByPassenger = async (req: Request, res: Response) => {
-  try {
-    const userId = req.userId;
-    const user = await User.findById({ _id: userId });
-    if (user) {
-      const { name } = user;
-      const tripsByUser = await Trip.find({ passenger: name });
-      console.log(tripsByUser);
-      if (tripsByUser) {
-        res.status(200).json({ status: 'success', data: tripsByUser });
-      } else {
-        res
-          .status(404)
-          .json({ status: 'failed', message: 'No trips created by user' });
-      }
-    }
-  } catch (err: any) {
-    res
-      .status(400)
-      .json({ message: 'Internal server error', error: err.message });
-  }
-};
+

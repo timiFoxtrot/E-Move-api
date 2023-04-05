@@ -10,7 +10,6 @@ import {
     getRoute,
     bookTrip,
     tripHistory,
-    tripHistoryByPassenger,
 } from '../controller/admin.controller';
 import { upload } from '../utils/multer';
 import { totalDrivers, getAllPassengers } from '../controller/admin.controller';
@@ -52,7 +51,5 @@ router.post('/createRoute', createRoute);
 router.patch('/editRoute/:id', updateRoutePrice);
 router.post('/booktrip/:routeId',authMiddleware, bookTrip);
 router.get('/tripHistory', tripHistory);
-router.get('/tripHistoryByPassenger',authMiddleware, tripHistoryByPassenger);
-
 
 export default router;
