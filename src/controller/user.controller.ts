@@ -379,10 +379,9 @@ export const getReference = async (
   next: NextFunction
 ) => {
   try {
-    const userId = req.userId;
+    // const userId = req.userId;
     const transactionId = req.query.transId;
     const transaction = await Transaction.findOne({
-      userId,
       _id: transactionId,
     });
     if (transaction?.ref === req.query.reference) {
