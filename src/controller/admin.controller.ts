@@ -269,49 +269,6 @@ export const updateRoutePrice = async (req: Request, res: Response) => {
   }
 };
 
-export const bookTrip = async (req: Request, res: Response) => {
-  // Decode the JWT and extract the user ID
-  try {
-    const userId = req.userId;
-
-    const routeId = req.params.routeId;
-
-    try {
-      const route = await Route.findById({ _id: routeId });
-      console.log(route);
-      if (route) {
-        const { pickup, destination, price } = route;
-
-        const user = await User.findById({ _id: userId });
-        console.log(user);
-        if (user) {
-          // if user wallet ballance is less thab trip price return errrror
-          if (user.walletBalance < price) {
-            return res.status(400).json({ message: 'Insufficient fund' });
-          }
-
-          const newTrip = new Trip({
-            pickup: pickup,
-            destination: destination,
-            price: price,
-            passenger: user.name,
-          });
-          await newTrip.save();
-          const newBallance = user.walletBalance - price;
-          await User.findByIdAndUpdate(userId, { walletBalance: newBallance });
-          return res
-            .status(200)
-            .json({ message: 'book successfull', trip: newTrip });
-        }
-      }
-    } catch (error) {
-      return res.status(500).json({ error: 'Route not found' });
-    }
-  } catch (err) {
-    res.status(400).json({ error: 'Invalid token' });
-  }
-};
-
 export const tripHistory = async (req: Request, res: Response) => {
   try {
     const result = await Trip.find({});

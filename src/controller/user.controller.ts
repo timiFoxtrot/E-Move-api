@@ -385,7 +385,7 @@ export const getReference = async (
       userId,
       _id: transactionId,
     });
-    if (transaction?.processed === true) {
+    if (transaction?.ref === req.query.reference) {
       return res.send(
         `This ${transaction?.status} transaction has already been verified`
       );
@@ -426,7 +426,7 @@ export const getReference = async (
 
         const updatedTransaction = await Transaction.findByIdAndUpdate(
           { _id: transactionId },
-          { processed: true, status: 'accepted' },
+          { processed: true, status: 'accepted', ref: req.query.reference },
           { new: true }
         );
 
@@ -492,5 +492,48 @@ export const tripHistoryByPassenger = async (req: Request, res: Response) => {
     res
       .status(400)
       .json({ message: 'Internal server error', error: err.message });
+  }
+};
+
+export const bookTrip = async (req: Request, res: Response) => {
+  // Decode the JWT and extract the user ID
+  try {
+    const userId = req.userId;
+
+    const routeId = req.params.routeId;
+
+    try {
+      const route = await Route.findById({ _id: routeId });
+      console.log(route);
+      if (route) {
+        const { pickup, destination, price } = route;
+
+        const user = await User.findById({ _id: userId });
+        console.log(user);
+        if (user) {
+          // if user wallet ballance is less thab trip price return errrror
+          if (user.walletBalance < price) {
+            return res.status(400).json({ message: 'Insufficient fund' });
+          }
+
+          const newTrip = new Trip({
+            pickup: pickup,
+            destination: destination,
+            price: price,
+            passenger: user.name,
+          });
+          await newTrip.save();
+          const newBallance = user.walletBalance - price;
+          await User.findByIdAndUpdate(userId, { walletBalance: newBallance });
+          return res
+            .status(200)
+            .json({ message: 'book successfull', trip: newTrip });
+        }
+      }
+    } catch (error) {
+      return res.status(500).json({ error: 'Route not found' });
+    }
+  } catch (err) {
+    res.status(400).json({ error: 'Invalid token' });
   }
 };

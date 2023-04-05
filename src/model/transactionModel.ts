@@ -7,7 +7,8 @@ const transactionSchema = new Schema({
   status: { type: String },
   amount: { type: Number, required: true },
   transactionType: { type: String, required: true },
-  processed: {type: Boolean, default: false}
+  processed: {type: Boolean, default: false},
+  ref: {type: String,}
 });
 
 const Transaction = mongoose.model("transaction", transactionSchema);

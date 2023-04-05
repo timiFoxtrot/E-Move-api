@@ -8,7 +8,6 @@ import {
     updateDriver,
     getAllRoutes,
     getRoute,
-    bookTrip,
     tripHistory,
 } from '../controller/admin.controller';
 import { upload } from '../utils/multer';
@@ -49,7 +48,6 @@ router.get('/getRoute/:id', getRoute);
 
 router.post('/createRoute', createRoute);
 router.patch('/editRoute/:id', updateRoutePrice);
-router.post('/booktrip/:routeId',authMiddleware, bookTrip);
 router.get('/tripHistory', tripHistory);
 
 export default router;
