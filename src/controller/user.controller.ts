@@ -362,6 +362,7 @@ export const initPayment = async (
         userId: req.userId,
         transactionType: 'Credit',
         amount: form.amount,
+        ref: response.data.reference
       };
       const transaction = new Transaction(newTransaction);
       await transaction.save();
@@ -380,11 +381,11 @@ export const getReference = async (
 ) => {
   try {
     // const userId = req.userId;
-    const transactionId = req.query.transId;
+    // const transactionId = req.query.transId;
     const transaction = await Transaction.findOne({
-      _id: transactionId,
+      ref: req.query.reference,
     });
-    if (transaction?.ref === req.query.reference) {
+    if (transaction?.processed === true) {
       return res.send(
         `This ${transaction?.status} transaction has already been verified`
       );
@@ -424,8 +425,8 @@ export const getReference = async (
         );
 
         const updatedTransaction = await Transaction.findByIdAndUpdate(
-          { _id: transactionId },
-          { processed: true, status: 'accepted', ref: req.query.reference },
+          { _id: transaction?._id },
+          { processed: true, status: 'accepted', },
           { new: true }
         );
 
@@ -436,7 +437,7 @@ export const getReference = async (
         });
       } else {
         const updatedTransaction = await Transaction.findByIdAndUpdate(
-          { _id: transactionId },
+          { _id: transaction?._id },
           { processed: true, status: 'declined' },
           { new: true }
         );
