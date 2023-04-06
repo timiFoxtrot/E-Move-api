@@ -6,8 +6,6 @@ import {
     getOneDriver,
     registerDriver,
     updateDriver,
-    getAllRoutes,
-    getRoute,
     tripHistory,
 } from '../controller/admin.controller';
 import { upload } from '../utils/multer';
@@ -39,12 +37,9 @@ router.put(
 router.get('/allDrivers', getAllDrivers);
 router.get('/drivers/:id', getOneDriver);
 router.delete('/drivers/:id', deleteDriver);
-router.get('/totalSuccessfulRides/:id');
+// router.get('/totalSuccessfulRides/:id');
 router.get('/totalPassengers', getAllPassengers);
 router.get('/totalDrivers', totalDrivers);
-
-router.get('/getAllRoutes', getAllRoutes);
-router.get('/getRoute/:id', getRoute);
 
 router.post('/createRoute', createRoute);
 router.patch('/editRoute/:id', updateRoutePrice);

@@ -164,9 +164,13 @@ export const login = async (
 
     const token = loginToken(user._id.toString());
 
+    const { name, phone, walletBalance, createdAt } = user;
     res.status(200).send({
       message: 'login successful',
-      user,
+      name,
+      phone,
+      walletBalance,
+      createdAt,
       loginToken: token,
     });
   } catch (error) {
@@ -260,7 +264,7 @@ export const forgotPassword = async (
       }).save();
     }
 
-    const BASE_URL = process.env.BASE_URL || 'http://localhost:8081'
+    const BASE_URL = process.env.BASE_URL || 'http://localhost:8081';
     const link = `${BASE_URL}/api/v1/users/password-reset/${user._id}/${token.token}`;
     await sendEmail(user.email, 'Password reset', link);
     //send password reset link to email
@@ -362,7 +366,7 @@ export const initPayment = async (
         userId: req.userId,
         transactionType: 'Credit',
         amount: form.amount,
-        ref: response.data.reference
+        ref: response.data.reference,
       };
       const transaction = new Transaction(newTransaction);
       await transaction.save();
@@ -426,7 +430,7 @@ export const getReference = async (
 
         const updatedTransaction = await Transaction.findByIdAndUpdate(
           { _id: transaction?._id },
-          { processed: true, status: 'accepted', },
+          { processed: true, status: 'accepted' },
           { new: true }
         );
 
@@ -479,7 +483,6 @@ export const tripHistoryByPassenger = async (req: Request, res: Response) => {
     if (user) {
       const { name } = user;
       const tripsByUser = await Trip.find({ passenger: name });
-      console.log(tripsByUser);
       if (tripsByUser) {
         res.status(200).json({ status: 'success', data: tripsByUser });
       } else {

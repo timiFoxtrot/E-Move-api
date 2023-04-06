@@ -59,7 +59,6 @@ export const updateDriver = async (
   res: Response,
   next: NextFunction
 ) => {
-  console.log('update');
   try {
     const driverId = req.params.id;
     const updatedDriver = await Driver.findByIdAndUpdate(driverId, req.body, {
@@ -84,10 +83,8 @@ export const getAllDrivers = async (
   res: Response,
   next: NextFunction
 ) => {
-  console.log('get');
   try {
-    const driver = req.params;
-    const allDrivers = await Driver.find(driver, req.body, { new: true });
+    const allDrivers = await Driver.find({});
     return res.status(200).send({
       status: 'success',
       message: 'successful',
@@ -175,10 +172,7 @@ export const totalDrivers = async (
 ) => {
   console.log('get');
   try {
-    const drivers = req.params;
-    const totalDrivers = await Driver.find(drivers, req.body, {
-      new: true,
-    });
+    const totalDrivers = await Driver.find({});
     return res.status(200).send({
       status: 'success',
       message: 'successful',
@@ -192,37 +186,13 @@ export const totalDrivers = async (
   }
 };
 
-export const getAllRoutes = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const routes = await Route.find();
-    res.send(routes);
-  } catch (error) {
-    res.send('An error occured');
-    console.log(error);
-  }
-};
-
-export const getRoute = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const route = await Route.findById(req.params.id);
-    res.send(route);
-  } catch (error) {
-    res.send('An error occured');
-    console.log(error);
-  }
-};
-
 export const createRoute = async (req: Request, res: Response) => {
   const { pickup, destination, price } = req.body;
   try {
+    const route = await Route.findOne({pickup, destination})
+    if (route) {
+      return res.send({message: "Route already exists"})
+    }
     const { error } = validateRoute({ pickup, destination, price });
     if (error) throw new Error(error.details[0].message);
   } catch (err: any) {
