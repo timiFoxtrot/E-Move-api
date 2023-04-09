@@ -22,7 +22,7 @@ router.patch('/change-password', changePassword);
 router.post('/login', login);
 router.post('/forgotPassword', forgotPassword);
 router.post('/password-reset/:userId/:token', resetPassword);
-router.get('/getAllRoutes', authMiddleware, getAllRoutes);
+router.get('/getAllRoutes', getAllRoutes);
 router.get('/getRoute/:id', getRoute);
 router.post("/paystack/pay", authMiddleware, initPayment)
 router.get("/paystack/callback", getReference)
