@@ -312,6 +312,7 @@ export const getAllRoutes = async (
   next: NextFunction
 ) => {
   try {
+    console.log("getAllRoute");
     const routes = await Route.find();
     res.send(routes);
   } catch (error) {
@@ -340,6 +341,7 @@ export const initPayment = async (
   next: NextFunction
 ) => {
   try {
+    console.log("hello");
     const { amount } = req.body;
     const userId = req.userId;
 
@@ -361,6 +363,7 @@ export const initPayment = async (
       }
 
       const response = JSON.parse(body);
+      console.log(response);
 
       const newTransaction = {
         userId: req.userId,
@@ -375,7 +378,9 @@ export const initPayment = async (
         transaction,
       });
     });
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export const getReference = async (
@@ -434,11 +439,12 @@ export const getReference = async (
           { new: true }
         );
 
-        return res.send({
-          message: 'Transaction accepted',
-          donor,
-          transaction: updatedTransaction,
-        });
+        res.redirect("http://localhost:3000/user/fund-wallet")
+        // return res.send({
+        //   message: 'Transaction accepted',
+        //   donor,
+        //   transaction: updatedTransaction,
+        // });
       } else {
         const updatedTransaction = await Transaction.findByIdAndUpdate(
           { _id: transaction?._id },
@@ -446,11 +452,12 @@ export const getReference = async (
           { new: true }
         );
 
-        return res.send({
-          message: 'Transaction declined',
-          donor,
-          transaction: updatedTransaction,
-        });
+        res.redirect("http://localhost:3000/user/fund-wallet")
+        // return res.send({
+        //   message: 'Transaction declined',
+        //   donor,
+        //   transaction: updatedTransaction,
+        // });
       }
     });
   } catch (error) {
