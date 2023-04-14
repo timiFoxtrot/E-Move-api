@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   bookTrip,
+  getUser,
   tripHistoryByPassenger,
 } from '../controller/user.controller';
 import {
@@ -30,7 +31,8 @@ router.get('/getRoute/:id', getRoute);
 router.post('/paystack/pay', authMiddleware, initPayment);
 router.get('/paystack/callback', getReference);
 router.get('/tripHistoryByPassenger', authMiddleware, tripHistoryByPassenger);
-router.get('/transaction/:userId', getTransaction);
+router.get('/transactions', authMiddleware, getTransaction);
 router.post('/booktrip/:routeId', authMiddleware, bookTrip);
+router.get('/getUser', authMiddleware, getUser)
 
 export default router;

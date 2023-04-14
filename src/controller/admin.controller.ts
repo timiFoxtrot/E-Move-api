@@ -24,6 +24,7 @@ export const registerDriver = async (
     console.log(req.body);
     const { fullName, operationRoute, phone, accountNo } = req.body;
     const body: any = req.files;
+    console.log(body);
 
     const route = await Route.findById(operationRoute);
     if (!route) {

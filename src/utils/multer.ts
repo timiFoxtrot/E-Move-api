@@ -13,6 +13,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: async (req, file) => {
+      console.log("storageFile", file);
         return {
             folder: 'Echo',
             format: 'jpeg',
@@ -26,6 +27,7 @@ const fileFilter = (
     file: Express.Multer.File,
     callback: FileFilterCallback
 ): void => {
+  console.log("file", file);
     if (!file.originalname.match(/\.(jpg|jpeg|png|pdf)$/)) {
         return callback(new Error('File type not supported'));
     }

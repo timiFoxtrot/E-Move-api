@@ -312,7 +312,7 @@ export const getAllRoutes = async (
   next: NextFunction
 ) => {
   try {
-    console.log("getAllRoute");
+    console.log('getAllRoute');
     const routes = await Route.find();
     res.send(routes);
   } catch (error) {
@@ -341,7 +341,7 @@ export const initPayment = async (
   next: NextFunction
 ) => {
   try {
-    console.log("hello");
+    console.log('hello');
     const { amount } = req.body;
     const userId = req.userId;
 
@@ -439,7 +439,7 @@ export const getReference = async (
           { new: true }
         );
 
-        res.redirect("http://localhost:3000/user/fund-wallet")
+        res.redirect('http://localhost:3000/user/fund-wallet');
         // return res.send({
         //   message: 'Transaction accepted',
         //   donor,
@@ -452,7 +452,7 @@ export const getReference = async (
           { new: true }
         );
 
-        res.redirect("http://localhost:3000/user/fund-wallet")
+        res.redirect('http://localhost:3000/user/fund-wallet');
         // return res.send({
         //   message: 'Transaction declined',
         //   donor,
@@ -472,7 +472,7 @@ export const getTransaction = async (
 ) => {
   try {
     const transaction = await Transaction.find({
-      userId: req.params.userId,
+      userId: req.userId,
     });
     res.send(transaction);
   } catch (error) {
@@ -545,5 +545,25 @@ export const bookTrip = async (req: Request, res: Response) => {
     }
   } catch (err) {
     res.status(400).json({ error: 'Invalid token' });
+  }
+};
+
+export const getUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const id = req.userId;
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).send({
+        message: 'User not found',
+      });
+    }
+
+    res.status(200).send({ status: 'success', user });
+  } catch (error) {
+    res.status(400).send({ message: 'Error fetching user' });
   }
 };
