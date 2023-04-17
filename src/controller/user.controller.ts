@@ -65,6 +65,7 @@ export const register = async (
     const BASE_URL = process.env.BASE_URL || 'http://localhost:8081/api/v1';
 
     const url = `${BASE_URL}/users/verify/${userSaved._id}/${token.token}`;
+    console.log(url);
     const html = `<h1>Email Verification</h1>
         <h2>Hello ${userSaved.name}</h2>
         <p>Click the link below to verify mail</p>
@@ -77,6 +78,7 @@ export const register = async (
       message: 'An email has been sent to your account please verify',
       userId: userSaved._id,
       token: token.token,
+      isAdmin: userSaved.isAdmin
     });
   } catch (error) {
     // console.log(error);
@@ -264,8 +266,8 @@ export const forgotPassword = async (
       }).save();
     }
 
-    const BASE_URL = process.env.BASE_URL || 'http://localhost:8081';
-    const link = `${BASE_URL}/api/v1/users/password-reset/${user._id}/${token.token}`;
+    const BASE_URL = process.env.BASE_URL || 'http://localhost:8081/api/v1';
+    const link = `${BASE_URL}/users/password-reset/${user._id}/${token.token}`;
     await sendEmail(user.email, 'Password reset', link);
     //send password reset link to email
 
