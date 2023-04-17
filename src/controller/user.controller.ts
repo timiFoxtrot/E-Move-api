@@ -174,7 +174,7 @@ export const login = async (
       walletBalance,
       createdAt,
       loginToken: token,
-      isAdmin: userSaved.isAdmin
+      isAdmin: user.isAdmin
     });
   } catch (error) {
     res.status(500).send('Error occured');
