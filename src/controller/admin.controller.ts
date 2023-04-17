@@ -21,11 +21,12 @@ export const registerDriver = async (
     if (isDriverExist) {
       return res.send('Driver with this name already exists');
     }
-    console.log(req.body);
+    console.log('req', req.body);
     const { fullName, operationRoute, phone, accountNo } = req.body;
     const body: any = req.files;
-    console.log(body);
+    console.log('body', body);
 
+    console.log('opRoute', operationRoute);
     const route = await Route.findById(operationRoute);
     if (!route) {
       return res.send('Invalid route Id');
@@ -61,10 +62,27 @@ export const updateDriver = async (
   next: NextFunction
 ) => {
   try {
+
+    const existingDriver = await Driver.findById(req.params.id)
+    console.log('update req.body', req.body);
+    const body: any = req.files;
+    console.log('body', body);
+    const {fullName, operationRoute, phone, accountNo} = req.body
     const driverId = req.params.id;
-    const updatedDriver = await Driver.findByIdAndUpdate(driverId, req.body, {
-      new: true,
-    });
+    const updatedDriver = await Driver.findByIdAndUpdate(
+      driverId,
+      {
+        fullName: fullName || existingDriver?.fullName,
+        operationRoute: operationRoute || existingDriver?.operationRoute,
+        phone: phone || existingDriver?.phone,
+        accountNo: accountNo || existingDriver?.accountNo,
+        photo: body && body.photo ? body.photo[0].path : existingDriver?.photo,
+        driverId: body && body.driverId ? body.driverId[0].path : existingDriver?.driverId,
+      },
+      {
+        new: true,
+      }
+    );
     return res.status(200).send({
       status: 'success',
       message: 'update successful',
@@ -190,9 +208,9 @@ export const totalDrivers = async (
 export const createRoute = async (req: Request, res: Response) => {
   const { pickup, destination, price } = req.body;
   try {
-    const route = await Route.findOne({pickup, destination})
+    const route = await Route.findOne({ pickup, destination });
     if (route) {
-      return res.send({message: "Route already exists"})
+      return res.send({ message: 'Route already exists' });
     }
     const { error } = validateRoute({ pickup, destination, price });
     if (error) throw new Error(error.details[0].message);
@@ -252,5 +270,3 @@ export const tripHistory = async (req: Request, res: Response) => {
       .json({ message: 'Internal server error', error: err.message });
   }
 };
-
-

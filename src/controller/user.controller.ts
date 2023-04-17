@@ -46,8 +46,8 @@ export const register = async (
 
     const hashedPassword = await toHash(userData.password);
 
-    const { ADMIN1_EMAIL, ADMIN2_EMAIL } = process.env;
-    const adminArray = [ADMIN1_EMAIL, ADMIN2_EMAIL];
+    const { ADMIN1_EMAIL, ADMIN2_EMAIL, ADMIN3_EMAIL } = process.env;
+    const adminArray = [ADMIN1_EMAIL, ADMIN2_EMAIL, ADMIN3_EMAIL];
 
     const allUserData = {
       ...userData,
@@ -131,7 +131,7 @@ export const verifyEmail = async (
     //   status: 'success',
     //   message: 'Email verified successfully',
     // });
-    res.redirect('https://emove.netlify.app/users/verify');
+    res.redirect('http://localhost:3000/users/verify');
   } catch (error) {
     return res.status(500).send({
       status: 'error',
