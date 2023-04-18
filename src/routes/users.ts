@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   bookTrip,
+  getPasswordReset,
   getUser,
   tripHistoryByPassenger,
 } from '../controller/user.controller';
@@ -25,7 +26,8 @@ router.get('/verify/:id/:token', verifyEmail);
 router.patch('/change-password', changePassword);
 router.post('/login', login);
 router.post('/forgotPassword', forgotPassword);
-router.post('/password-reset/:userId/:token', resetPassword);
+router.get('/password-reset/:userId/:token', getPasswordReset);
+router.post('/password-reset/:userId', resetPassword)
 router.get('/getAllRoutes', getAllRoutes);
 router.get('/getRoute/:id', getRoute);
 router.post('/paystack/pay', authMiddleware, initPayment);

@@ -16,7 +16,11 @@ import { initializePayment, verifyPayment } from '../utils/paystack';
 import Donor from '../model/donorModel';
 import _ from 'lodash';
 import Transaction from '../model/transactionModel';
-import { loginSchema, userSchema } from '../utils/joiValidator';
+import {
+  loginSchema,
+  resetPasswordSchema,
+  userSchema,
+} from '../utils/joiValidator';
 import Trip from '../model/tripModel';
 
 export const register = async (
@@ -78,7 +82,7 @@ export const register = async (
       message: 'An email has been sent to your account please verify',
       userId: userSaved._id,
       token: token.token,
-      isAdmin: userSaved.isAdmin
+      isAdmin: userSaved.isAdmin,
     });
   } catch (error) {
     // console.log(error);
@@ -174,7 +178,7 @@ export const login = async (
       walletBalance,
       createdAt,
       loginToken: token,
-      isAdmin: user.isAdmin
+      isAdmin: user.isAdmin,
     });
   } catch (error) {
     res.status(500).send('Error occured');
@@ -279,16 +283,12 @@ export const forgotPassword = async (
   }
 };
 
-export const resetPassword = async (
+export const getPasswordReset = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const schema = Joi.object({ password: Joi.string().required() });
-    const { error } = schema.validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-
     const user = await User.findById(req.params.userId);
     if (!user) return res.status(400).send('invalid link or expired');
 
@@ -297,15 +297,37 @@ export const resetPassword = async (
       token: req.params.token,
     });
     if (!token) return res.status(400).send('Invalid link or expired');
-
-    user.password = await toHash(req.body.password);
-    await user.save();
     await token.delete();
 
-    res.send('password reset sucessfully.');
+    res.redirect(`http://localhost:3000/reset-password/${user._id}`);
   } catch (error) {
     res.send('An error occured');
-    console.log(error);
+  }
+};
+
+export const resetPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { error } = resetPasswordSchema.validate(req.body);
+    if (error) {
+      return res.status(400).send({
+        success: false,
+        message: error.details[0].message,
+      });
+    }
+    const user = await User.findById(req.params.userId);
+    if (!user) return res.status(400).send('Invalid User Id');
+    user.password = await toHash(req.body.password);
+    await user.save();
+
+    res
+      .status(200)
+      .json({ status: 'success', message: 'password reset sucessfully.' });
+  } catch (error) {
+    res.send({ message: 'An error occured' });
   }
 };
 
