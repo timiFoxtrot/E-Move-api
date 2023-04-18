@@ -1,9 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import User from '../model/userModel';
 import Token from '../model/tokenModel';
-
 import Route from '../model/routeModel';
-
 import { toHash } from '../utils/passwordHashing';
 import { sendEmail } from '../utils/email.config';
 import crypto from 'crypto';
@@ -60,7 +58,6 @@ export const register = async (
     };
 
     const userSaved = await new User(allUserData).save();
-    console.log('userSaved', userSaved);
     const token = await new Token({
       userId: userSaved._id,
       token: getToken(userSaved._id),
@@ -69,7 +66,6 @@ export const register = async (
     const BASE_URL = process.env.BASE_URL || 'http://localhost:8081/api/v1';
 
     const url = `${BASE_URL}/users/verify/${userSaved._id}/${token.token}`;
-    console.log(url);
     const html = `<h1>Email Verification</h1>
         <h2>Hello ${userSaved.name}</h2>
         <p>Click the link below to verify mail</p>
@@ -85,7 +81,6 @@ export const register = async (
       isAdmin: userSaved.isAdmin,
     });
   } catch (error) {
-    // console.log(error);
     return res.status(500).send({
       status: 'error',
     });
@@ -193,7 +188,6 @@ export const changePassword = async (req: Request, res: Response) => {
 
   const { authorization } = req.headers;
   if (!authorization) {
-    console.log('auth fired');
     return res.status(401).json({ error: 'Access denied. No token provided.' });
   }
 
@@ -276,9 +270,9 @@ export const forgotPassword = async (
     await sendEmail(user.email, 'Password reset', link);
     //send password reset link to email
 
-    res.send('password reset link sent to your email account');
+    res.send({message: 'password reset link sent to your email account'});
   } catch (error) {
-    res.send('An error occured');
+    res.send({message: 'An error occured'});
     console.log(error);
   }
 };
@@ -320,7 +314,7 @@ export const resetPassword = async (
     }
     const user = await User.findById(req.params.userId);
     if (!user) return res.status(400).send('Invalid User Id');
-    user.password = await toHash(req.body.password);
+    user.password = await toHash(req.body.newPassword);
     await user.save();
 
     res
@@ -337,7 +331,6 @@ export const getAllRoutes = async (
   next: NextFunction
 ) => {
   try {
-    console.log('getAllRoute');
     const routes = await Route.find();
     res.send(routes);
   } catch (error) {
@@ -366,13 +359,12 @@ export const initPayment = async (
   next: NextFunction
 ) => {
   try {
-    console.log('hello');
     const { amount } = req.body;
     const userId = req.userId;
 
     const user = await User.findById(userId);
     if (!user) {
-      return res.send('Invalid user');
+      return res.send({ message: 'Invalid user' });
     }
     const form: any = {};
     form.name = user.name;
@@ -388,7 +380,6 @@ export const initPayment = async (
       }
 
       const response = JSON.parse(body);
-      console.log(response);
 
       const newTransaction = {
         userId: req.userId,
@@ -404,7 +395,7 @@ export const initPayment = async (
       });
     });
   } catch (error) {
-    console.log(error);
+    res.status(400).send({message: " Error initializing payment"})
   }
 };
 
@@ -421,14 +412,13 @@ export const getReference = async (
     });
     if (transaction?.processed === true) {
       return res.send(
-        `This ${transaction?.status} transaction has already been verified`
+        `This ${transaction?.transactionType} transaction has already been verified`
       );
     }
     const ref: string = req.query.reference as string;
     verifyPayment(ref, async (error: any, body: any) => {
       if (error) {
-        console.log(error);
-        return res.send(error);
+        return res.send({ message: 'Verification error occured', error });
       }
 
       const response = JSON.parse(body);
@@ -539,12 +529,10 @@ export const bookTrip = async (req: Request, res: Response) => {
 
     try {
       const route = await Route.findById({ _id: routeId });
-      console.log(route);
       if (route) {
         const { pickup, destination, price } = route;
 
         const user = await User.findById({ _id: userId });
-        console.log(user);
         if (user) {
           // if user wallet ballance is less thab trip price return errrror
           if (user.walletBalance < price) {

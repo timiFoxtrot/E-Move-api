@@ -5,38 +5,36 @@ const cloudinary = require('cloudinary').v2;
 
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: async (req, file) => {
-      console.log("hello");
-        return {
-            folder: 'Echo',
-            format: 'jpeg',
-            // public_id: "some_unique_id",
-        };
-    },
+  cloudinary: cloudinary,
+  params: async (req, file) => {
+    return {
+      folder: 'Echo',
+      format: 'jpeg',
+      // public_id: "some_unique_id",
+    };
+  },
 });
 
 const fileFilter = (
-    request: Request,
-    file: Express.Multer.File,
-    callback: FileFilterCallback
+  request: Request,
+  file: Express.Multer.File,
+  callback: FileFilterCallback
 ): void => {
-  console.log("hello");
-    if (!file.originalname.match(/\.(jpg|jpeg|png|pdf)$/)) {
-        return callback(new Error('File type not supported'));
-    }
+  if (!file.originalname.match(/\.(jpg|jpeg|png|pdf)$/)) {
+    return callback(new Error('File type not supported'));
+  }
 
-    callback(null, true);
+  callback(null, true);
 };
 
 const limits = {
-  fileSize: 1000000
-}
+  fileSize: 1000000,
+};
 
-export const upload = multer({ storage, fileFilter, limits});
+export const upload = multer({ storage, fileFilter, limits });

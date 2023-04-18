@@ -9,7 +9,6 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import connect from './db/connect';
-import indexRouter from './routes/index';
 import usersRouter from './routes/users';
 import adminRouter from './routes/admin';
 
@@ -30,7 +29,6 @@ app.get('/', (req, res) => {
   res.send('Welcome to the E-Move Api')
 })
 
-app.use('/', indexRouter);
 app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/admin', adminRouter);
 
@@ -51,7 +49,6 @@ app.use(function (
     res.locals.error = req.app.get('env') === 'development' ? err : {};
 
     // render the error page
-    console.log(err);
     res.status(err.status || 500);
     res.render('error');
 });

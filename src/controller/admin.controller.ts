@@ -21,12 +21,9 @@ export const registerDriver = async (
     if (isDriverExist) {
       return res.send('Driver with this name already exists');
     }
-    console.log('req', req.body);
     const { fullName, operationRoute, phone, accountNo } = req.body;
     const body: any = req.files;
-    console.log('body', body);
 
-    console.log('opRoute', operationRoute);
     const route = await Route.findById(operationRoute);
     if (!route) {
       return res.send('Invalid route Id');
@@ -64,9 +61,7 @@ export const updateDriver = async (
   try {
 
     const existingDriver = await Driver.findById(req.params.id)
-    console.log('update req.body', req.body);
     const body: any = req.files;
-    console.log('body', body);
     const {fullName, operationRoute, phone, accountNo} = req.body
     const driverId = req.params.id;
     const updatedDriver = await Driver.findByIdAndUpdate(
@@ -116,13 +111,13 @@ export const getAllDrivers = async (
     });
   }
 };
+
 // Get one Driver//
 export const getOneDriver = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  console.log('get');
   try {
     const driverId = req.params.id;
     const oneDriver = await Driver.findById({ _id: driverId });
@@ -145,7 +140,6 @@ export const deleteDriver = async (
   res: Response,
   next: NextFunction
 ) => {
-  console.log('get');
   try {
     const driverId = req.params.id;
     const oneDriver = await Driver.findByIdAndDelete(driverId, req.body);
@@ -189,7 +183,6 @@ export const totalDrivers = async (
   res: Response,
   next: NextFunction
 ) => {
-  console.log('get');
   try {
     const totalDrivers = await Driver.find({});
     return res.status(200).send({
