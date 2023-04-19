@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const transactionSchema = new Schema(
   {
     userId: { type: String, required: true },
-    status: { type: String },
+    status: { type: String, default: "declined" },
     amount: { type: Number, required: true },
     transactionType: { type: String, required: true },
     processed: { type: Boolean, default: false },
