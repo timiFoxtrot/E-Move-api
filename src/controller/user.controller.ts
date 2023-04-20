@@ -270,9 +270,9 @@ export const forgotPassword = async (
     await sendEmail(user.email, 'Password reset', link);
     //send password reset link to email
 
-    res.send({message: 'password reset link sent to your email account'});
+    res.send({ message: 'password reset link sent to your email account' });
   } catch (error) {
-    res.send({message: 'An error occured'});
+    res.send({ message: 'An error occured' });
     console.log(error);
   }
 };
@@ -395,7 +395,7 @@ export const initPayment = async (
       });
     });
   } catch (error) {
-    res.status(400).send({message: " Error initializing payment"})
+    res.status(400).send({ message: ' Error initializing payment' });
   }
 };
 
@@ -534,8 +534,15 @@ export const bookTrip = async (req: Request, res: Response) => {
 
         const user = await User.findById({ _id: userId });
         if (user) {
+          const newTransaction = new Transaction({
+            userId,
+            amount: price * 100,
+            transactionType: 'Debit',
+          });
           // if user wallet ballance is less thab trip price return errrror
           if (user.walletBalance < price) {
+            newTransaction.processed = true;
+            await newTransaction.save();
             return res.status(400).json({ message: 'Insufficient fund' });
           }
 
@@ -547,13 +554,20 @@ export const bookTrip = async (req: Request, res: Response) => {
           });
           await newTrip.save();
           const newBallance = user.walletBalance - price;
+
           await User.findByIdAndUpdate(userId, { walletBalance: newBallance });
+
+          newTransaction.status = 'accepted';
+          newTransaction.processed = true;
+          await newTransaction.save();
+
           return res
             .status(200)
             .json({ message: 'book successfull', trip: newTrip });
         }
       }
     } catch (error) {
+      console.log(error);
       return res.status(500).json({ error: 'Route not found' });
     }
   } catch (err) {
