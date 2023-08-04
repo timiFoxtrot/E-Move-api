@@ -26,6 +26,7 @@ export const register = async (
   res: Response,
   next: NextFunction
 ) => {
+  console.log("heloooo")
   const userData = req.body;
   try {
     const { error } = userSchema.validate(req.body);
@@ -132,7 +133,7 @@ export const verifyEmail = async (
     //   status: 'success',
     //   message: 'Email verified successfully',
     // });
-    const clientUrl = 'https://main--emove-app.netlify.app/'
+    const clientUrl = 'https://main--emove-app.netlify.app/users/verify'
     res.redirect(clientUrl);
   } catch (error) {
     return res.status(500).send({
