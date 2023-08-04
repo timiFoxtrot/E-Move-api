@@ -133,7 +133,8 @@ export const verifyEmail = async (
     //   status: 'success',
     //   message: 'Email verified successfully',
     // });
-    res.redirect('https://main--emove-app.netlify.app/users/verify');
+    // res.redirect('https://main--emove-app.netlify.app/users/verify');
+    return res.redirect('https://www.google.com');
   } catch (error) {
     return res.status(500).send({
       status: 'error',
