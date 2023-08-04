@@ -18,24 +18,25 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-app.use(
-  // cors({
-  //   origin: 'http://localhost:3000',
-  //   credentials: true, //access-control-allow-credentials:true
-  // })
-  cors({
-    origin: function (origin: any, callback) {
-      const allowedOrigins = ['http://localhost:3001', 'https://main--emove-app.netlify.app'];
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    credentials: true
-  })
+// app.use(
+//   // cors({
+//   //   origin: 'http://localhost:3000',
+//   //   credentials: true, //access-control-allow-credentials:true
+//   // })
+//   cors({
+//     origin: function (origin: any, callback) {
+//       const allowedOrigins = ['http://localhost:3001', 'https://main--emove-app.netlify.app'];
+//       if (allowedOrigins.includes(origin)) {
+//         callback(null, true);
+//       } else {
+//         callback(new Error('Not allowed by CORS'));
+//       }
+//     },
+//     credentials: true
+//   })
   
-);
+// );
+app.use(cors())
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
